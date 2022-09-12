@@ -5,7 +5,7 @@
 
 import unittest
 
-from social_diffusers import social_diffusers
+from social_diffusers import diffs
 
 
 class TestSocial_diffusers(unittest.TestCase):

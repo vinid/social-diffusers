@@ -1,0 +1,47 @@
+import numpy as np
+from tqdm import tqdm
+from torch import autocast
+from diffusers import StableDiffusionPipeline
+from sentence_transformers import SentenceTransformer, util
+from PIL import Image
+
+
+class Diffs:
+    def __init__(self, device="cuda", *, hf_token):
+        self.model = SentenceTransformer('clip-ViT-B-32')
+        self.device = device
+        self.pipe = StableDiffusionPipeline.from_pretrained(
+            "CompVis/stable-diffusion-v1-4",
+            use_auth_token=hf_token
+        ).to(device)
+        self.pipe.set_progress_bar_config(disable=True)
+
+
+    def generate_image_embedding(self, query, num_images=10):
+
+        images = []
+        embeddings = []
+        pbar = tqdm(total=num_images, position=0)
+
+        pbar.set_description(f"Generating query {query}")
+
+        for _ in range(0, num_images):
+
+            with autocast("cuda"):
+                image = pipe(query)["sample"][0]
+
+            images.append(image)
+            pbar.update(1)
+        pbar.close()
+
+        for img in images:
+            embeddings.append(self.model.encode(img))
+
+        embeddings = np.mean(embeddings, axis=0)
+
+        return embeddings
+
+    def generate_sentence_embedding(self, query):
+        # not the smartest way
+        return self.modelmodel.encode([query])[0]
+
