@@ -43,5 +43,5 @@ class Diffs:
 
     def generate_sentence_embedding(self, query):
         # not the smartest way
-        return self.modelmodel.encode([query])[0]
+        return self.model.encode([query])[0]
 
