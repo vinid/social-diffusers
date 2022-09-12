@@ -28,7 +28,7 @@ class Diffs:
         for _ in range(0, num_images):
 
             with autocast("cuda"):
-                image = pipe(query)["sample"][0]
+                image = self.pipe(query)["sample"][0]
 
             images.append(image)
             pbar.update(1)
