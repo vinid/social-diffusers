@@ -16,11 +16,8 @@ class Diffs:
         ).to(device)
         self.pipe.set_progress_bar_config(disable=True)
 
-
-    def generate_image_embedding(self, query, num_images=10):
-
+    def generate_images(self, query, num_images=10):
         images = []
-        embeddings = []
         pbar = tqdm(total=num_images, position=0)
 
         pbar.set_description(f"Generating query {query}")
@@ -33,13 +30,22 @@ class Diffs:
             images.append(image)
             pbar.update(1)
         pbar.close()
+        return images
+
+    def generate_image_embedding(self, query, num_images=10, return_image=False):
+
+        embeddings = []
+        images = self.generate_images(query, num_images)
 
         for img in images:
             embeddings.append(self.model.encode(img))
 
         embeddings = np.mean(embeddings, axis=0)
 
-        return embeddings
+        if return_image:
+            return embeddings, images
+        else:
+            return embeddings
 
     def generate_sentence_embedding(self, query):
         # not the smartest way
