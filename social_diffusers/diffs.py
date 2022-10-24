@@ -7,11 +7,11 @@ from PIL import Image
 
 
 class Diffs:
-    def __init__(self, device="cuda", *, hf_token):
+    def __init__(self, device="cuda", *, hf_token, model_type="CompVis/stable-diffusion-v1-4"):
         self.model = SentenceTransformer('clip-ViT-B-32')
         self.device = device
         self.pipe = StableDiffusionPipeline.from_pretrained(
-            "CompVis/stable-diffusion-v1-4",
+            model_type,
             use_auth_token=hf_token
         ).to(device)
         self.pipe.set_progress_bar_config(disable=True)
@@ -25,7 +25,7 @@ class Diffs:
         for _ in range(0, num_images):
 
             with autocast("cuda"):
-                image = self.pipe(query)["sample"][0]
+                image = self.pipe(query)[0]
 
             images.append(image)
             pbar.update(1)
