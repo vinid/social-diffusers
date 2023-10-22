@@ -1,18 +1,19 @@
 import numpy as np
 from tqdm import tqdm
 from torch import autocast
-from diffusers import StableDiffusionPipeline
 from sentence_transformers import SentenceTransformer, util
 from PIL import Image
-
+from diffusers import DiffusionPipeline
+import torch
 
 class Diffs:
     def __init__(self, device="cuda", *, hf_token, model_type="CompVis/stable-diffusion-v1-4"):
         self.model = SentenceTransformer('clip-ViT-B-32')
         self.device = device
-        self.pipe = StableDiffusionPipeline.from_pretrained(
+        self.pipe = DiffusionPipeline.from_pretrained(
             model_type,
-            use_auth_token=hf_token
+            use_auth_token=hf_token,
+            torch_dtype=torch.float16
         ).to(device)
         self.pipe.set_progress_bar_config(disable=True)
 
@@ -25,7 +26,7 @@ class Diffs:
         for _ in range(0, num_images):
 
             with autocast("cuda"):
-                image = self.pipe(query)[0]
+                image = self.pipeline(query).images[0]
 
             images.append(image)
             pbar.update(1)
